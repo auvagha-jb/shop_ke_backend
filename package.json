@@ -1,0 +1,22 @@
+{
+  "name": "shop_ke_backend",
+  "version": "1.0.0",
+  "description": "Backend for ShopKe App",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index",
+    "dev": "nodemon index"
+  },
+  "author": "Jerry Auvagha",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^2.0.6"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "moment": "^2.29.1",
+    "mongoose": "^5.10.13",
+    "mysql": "^2.18.1",
+    "uuid": "^8.3.1"
+  }
+}
