@@ -1,45 +1,45 @@
 const express = require('express')
+const router = require('./utils/router.js')
+const env = require('./env')
+
+
+//Database and Tables 
+const db = require('./mysql/db.js');
+const Users = require('./mysql/users.js')
+
+//Init Tables
+const users = new Users();
+
+// End: Init Tables
+
 
 const app = express();
 
 //Middleware that assembles json sent in post request
 const bodyParser = require('body-parser')
 
-const PORT = process.env.PORT || 5000;
+const PORT = env.PORT;
 
+//Add Middleware
+app.use(bodyParser.json());
 app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
 
 
-const db = require('./mysql/db');
+//ROUTES
 
-//Init Tables
-
-const Users = require('./mysql/users.js')
-
-const users = new Users();
-
-app.use(bodyParser.json());
-
-
-//Init routes
-app.post('/users/', (req, res) => {
-    let response = users.insert(req.body);
+//User
+app.post(router('/user/'), (req, res) => {
+    users.write(req.body, res);
     console.log(req.body);
-    res.send(response);
 });
 
-app.get('/users/:id/', (req, res) => {
-    let sql = users.selectById(req.params.id);
-
-    db.query(sql, (err, results) => {
-        if (err) throw err;
-        res.send(results);
-    });
+app.get(router('/user/:id/'), (req, res) => {
+    users.selectById(req.params.id, res);
 });
 
-app.put('/users/:id', (req, res) => {
+app.put(router('/users/'), (req, res) => {
     console.log(req.body);
-    let response = users.update({ id: req.params.id, user: req.body });
+    let response = users.query({ id: req.params.id, user: req.body });
     res.send(response);
 });
 

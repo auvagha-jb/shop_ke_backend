@@ -11,67 +11,81 @@ class Table {
     createTable(sql) {
         let status = false;
 
-        try {
-
-            db.query(sql, (err, result) => {
+        db.query(sql, (err, result) => {
+            try {
                 if (err) throw err;
-                console.log(result);
-            });
+                // console.log(result);
+                status = true;
 
-            status = true;
-
-        } catch (error) {
-            console.error(error);
-        }
+            } catch (error) {
+                console.error(error);
+            }
+        });
 
         return status;
     }
 
+    write({ object, sql, successMessage, response }) {
+        db.query(sql, object, (err, result) => {
 
-    insert({ object, sql }) {
-        let status = false;
-        let message;
-
-        try {
-            db.query(sql, object, (err, result) => {
+            try {
                 if (err) throw err;
-                console.log(result);
-            });
+                console.log(result)
 
-            message = `${this.objectName} added successfully`;
-            status = true;
+                response.send({
+                    response: successMessage != null ? successMessage : `${this.objectName} added successfully`,
+                    status: result.affectedRows > 0,
+                    insertId: result.insertId
+                });
 
-        } catch (error) {
-            message = "Something went wrong. Please try again";
-        }
-
-        return {
-            message: message,
-            status: status
-        }
+            } catch (error) {
+                response.send({
+                    response: 'Something went wrong. Please try again later',
+                    status: false,
+                });
+            }
+        });
     }
-    
-    update(sql) {
-        let status = false;
-        let message;
 
-        try {
-            db.query(sql, (err, result) => {
+    query({ sql, response }) {
+        db.query(sql, (err, result) => {
+            try {
                 if (err) throw err;
                 console.log(result);
-            });
 
-            message = `Updated ${this.objectName} successfully`;
-            status = true;
+                response.send({
+                    status: true,
+                    response: result
+                });
 
-        } catch (error) {
-            message = "Something went wrong. Please try again";
-        }
+            } catch (error) {
+                response.send({
+                    status: false,
+                    response: 'Something went wrong. Please try again later'
+                });
+            }
+        });
+    }
 
-        return {
-            message: message,
-            status: status
-        }
+
+    delete({ sql, response }) {
+        db.query(sql, (err, result) => {
+            try {
+                if (err) throw err;
+                console.log(result);
+
+                response.send({
+                    status: result.affectedRows > 0,
+                    response: successMessage != null ? successMessage : `${this.objectName} deleted successfully`,
+                });
+
+            } catch (error) {
+                response.send({
+                    status: false,
+                    response: 'Something went wrong. Please try again later'
+                });
+            }
+        });
     }
 
 

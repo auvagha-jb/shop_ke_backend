@@ -1,6 +1,6 @@
 const Table = require('./table')
 
-class Users extends Table {
+class Stores extends Table {
 
     constructor() {
         super('User');
@@ -9,23 +9,20 @@ class Users extends Table {
 
     createTable() {
         // Create table
-        let sql = ` CREATE TABLE IF NOT EXISTS users (
-            userId INT(255) PRIMARY KEY NOT NULL AUTO_INCREMENT, 
-            firstName VARCHAR(255) NOT NULL, 
-            lastName VARCHAR(255) NOT NULL, 
-            email VARCHAR(255) NOT NULL, 
-            countryCode VARCHAR(255) NOT NULL, 
-            phoneNumber VARCHAR(255) NOT NULL,  
-            isShopOwner INT(1) NOT NULL
+        let sql = ` CREATE TABLE IF NOT EXISTS stores (
+            storeId INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT, 
+            userId INT(11) NOT NULL,
+            storeName VARCHAR(255) NOT NULL,
+            logo VARCHAR(255) NOT NULL,
         )`;
 
         return super.createTable(sql);
     }
 
 
-    write(user, response) {
+    insert(user) {
         let sql = 'INSERT INTO users SET ?';
-        return super.write({ object: user, sql, response });
+        return super.insert({ object: user, sql: sql })
     }
 
     query({ id, user }) {
@@ -39,17 +36,15 @@ class Users extends Table {
                     isShopOwner = '${user.isShopOwner}' WHERE id = ${id}
                     `;
 
-        console.log(sql);
-
-        return super.query({ object: user, sql: sql });
+        return super.query({object: user, sql: sql});
     }
 
-    selectById(id, response) {
-        let sql = `SELECT * FROM users WHERE userId = ${id}`;
-        super.query({ sql, response });
+    selectById(id) {
+        let sql = `SELECT * FROM users WHERE id = ${id}`;
+        return sql;
     }
 
 }
 
 
-module.exports = Users;
+module.exports = Stores;
