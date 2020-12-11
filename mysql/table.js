@@ -14,7 +14,7 @@ class Table {
         db.query(sql, (err, result) => {
             try {
                 if (err) throw err;
-                // console.log(result);
+                console.log(result);
                 status = true;
 
             } catch (error) {
@@ -25,6 +25,9 @@ class Table {
         return status;
     }
 
+    /**
+     * For insert and update queries 
+     */
     write({ object, sql, successMessage, response }) {
         db.query(sql, object, (err, result) => {
 
@@ -41,13 +44,17 @@ class Table {
             } catch (error) {
                 response.send({
                     response: 'Something went wrong. Please try again later',
+                    log: { error, object},
                     status: false,
                 });
             }
         });
     }
 
-    query({ sql, response }) {
+    /**
+     * For select queries
+     */
+    select({ sql, response }) {
         db.query(sql, (err, result) => {
             try {
                 if (err) throw err;
@@ -61,13 +68,16 @@ class Table {
             } catch (error) {
                 response.send({
                     status: false,
-                    response: 'Something went wrong. Please try again later'
+                    response: 'Something went wrong. Please try again later',
+                    log: { error, sql },
                 });
             }
         });
     }
 
-
+    /**
+     * For delete queries
+     */
     delete({ sql, response }) {
         db.query(sql, (err, result) => {
             try {

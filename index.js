@@ -21,25 +21,38 @@ const bodyParser = require('body-parser')
 const PORT = env.PORT;
 
 //Add Middleware
+
+//Parse json responses to objects 
 app.use(bodyParser.json());
+
+//Allow cross origin requests
+// app.use((req, res, next) => {
+//     res.header('Access-Control-Allow-Origin', '*');
+//     next();
+// });
+
 app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
 
 
 //ROUTES
 
 //User
-app.post(router('/user/'), (req, res) => {
-    users.write(req.body, res);
+app.post(router('user/'), (req, res) => {
+    users.insert(req.body, res);
     console.log(req.body);
 });
 
-app.get(router('/user/:id/'), (req, res) => {
+app.get(router('user/:id/'), (req, res) => {
     users.selectById(req.params.id, res);
 });
 
-app.put(router('/users/'), (req, res) => {
+app.get(router('user/firebase/:id/'), (req, res) => {
+    users.selectByFirebaseId(req.params.id, res);
+});
+
+app.put(router('users/'), (req, res) => {
     console.log(req.body);
-    let response = users.query({ id: req.params.id, user: req.body });
+    let response = users.select({ id: req.params.id, user: req.body });
     res.send(response);
 });
 

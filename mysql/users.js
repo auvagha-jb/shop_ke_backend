@@ -11,6 +11,7 @@ class Users extends Table {
         // Create table
         let sql = ` CREATE TABLE IF NOT EXISTS users (
             userId INT(255) PRIMARY KEY NOT NULL AUTO_INCREMENT, 
+            firebaseId VARCHAR(255) NOT NULL,
             firstName VARCHAR(255) NOT NULL, 
             lastName VARCHAR(255) NOT NULL, 
             email VARCHAR(255) NOT NULL, 
@@ -23,12 +24,12 @@ class Users extends Table {
     }
 
 
-    write(user, response) {
+    insert(user, response) {
         let sql = 'INSERT INTO users SET ?';
         return super.write({ object: user, sql, response });
     }
 
-    query({ id, user }) {
+    update({ id, user }) {
         let sql = ` UPDATE users SET
                     firstName  = '${user.firstName}', 
                     lastName = '${user.lastName}', 
@@ -41,12 +42,17 @@ class Users extends Table {
 
         console.log(sql);
 
-        return super.query({ object: user, sql: sql });
+        super.select({ object: user, sql: sql });
     }
 
     selectById(id, response) {
         let sql = `SELECT * FROM users WHERE userId = ${id}`;
-        super.query({ sql, response });
+        super.select({ sql, response });
+    }
+
+    selectByFirebaseId(id, response) {
+        let sql = `SELECT * FROM users WHERE firebaseId = '${id}' LIMIT 1`;
+        super.select({ sql, response });
     }
 
 }
