@@ -1,6 +1,5 @@
 const db = require('./db');
-
-const express = require('express');
+const transaction = require('./transaction');
 
 class Table {
 
@@ -25,6 +24,17 @@ class Table {
         return status;
     }
 
+    generateUniqueId() {
+        var result = '';
+        var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        var charactersLength = characters.length;
+        for (var i = 0; i < length; i++) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        }
+        // console.log(makeid(5));
+        return result;
+    }
+
     /**
      * For insert and update queries 
      */
@@ -44,9 +54,11 @@ class Table {
             } catch (error) {
                 response.send({
                     response: 'Something went wrong. Please try again later',
-                    log: { error, object},
+                    log: { error, object },
                     status: false,
                 });
+            } finally {
+                db.close();
             }
         });
     }
@@ -71,6 +83,9 @@ class Table {
                     response: 'Something went wrong. Please try again later',
                     log: { error, sql },
                 });
+
+            } finally {
+                db.close();
             }
         });
     }
@@ -94,10 +109,12 @@ class Table {
                     status: false,
                     response: 'Something went wrong. Please try again later'
                 });
+
+            } finally {
+                db.close();
             }
         });
     }
-
 
 
 }
