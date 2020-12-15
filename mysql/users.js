@@ -10,49 +10,46 @@ class Users extends Table {
     createTable() {
         // Create table
         let sql = ` CREATE TABLE IF NOT EXISTS users (
-            userId INT(255) PRIMARY KEY NOT NULL AUTO_INCREMENT, 
+            userId VARCHAR(128) PRIMARY KEY NOT NULL, 
             firebaseId VARCHAR(255) NOT NULL,
             firstName VARCHAR(255) NOT NULL, 
             lastName VARCHAR(255) NOT NULL, 
             email VARCHAR(255) NOT NULL, 
             countryCode VARCHAR(255) NOT NULL, 
             phoneNumber VARCHAR(255) NOT NULL,  
-            isShopOwner INT(1) NOT NULL
+            isShopOwner INT(1) NOT NULL,
+            createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP 
         )`;
 
-        return super.createTable(sql);
+        super.createTable(sql);
     }
 
 
-    insert(user, response) {
+    insert(user) {
         let sql = 'INSERT INTO users SET ?';
-        return super.write({ object: user, sql, response });
+        return super.insertWithUUID({ sql, object: user, idField: 'userId' })
     }
 
     update({ id, user }) {
-        let sql = ` UPDATE users SET
-                    firstName  = '${user.firstName}', 
-                    lastName = '${user.lastName}', 
-                    email = '${user.email}', 
-                    countryCode = '${user.countryCode}', 
-                    phoneNumber = '${user.phoneNumber}', 
-                    fullPhoneNumber = '${user.fullPhoneNumber}', 
-                    isShopOwner = '${user.isShopOwner}' WHERE id = ${id}
-                    `;
-
+        let sql = ` UPDATE users SET ? WHERE userId = ?`;
         console.log(sql);
-
-        super.select({ object: user, sql: sql });
+        return super.query({ sql, args: [user, id] });
     }
 
-    selectById(id, response) {
-        let sql = `SELECT * FROM users WHERE userId = ${id}`;
-        super.select({ sql, response });
+    selectAll() {
+        let sql = 'SELECT * FROM users';
+        let response = super.query({ sql });
+        return response;
     }
 
-    selectByFirebaseId(id, response) {
-        let sql = `SELECT * FROM users WHERE firebaseId = '${id}' LIMIT 1`;
-        super.select({ sql, response });
+    selectById(id) {
+        let sql = `SELECT * FROM users WHERE userId = ?`;
+        return super.query({ sql, args: [id] });
+    }
+
+    selectByFirebaseId(id) {
+        let sql = `SELECT * FROM users WHERE firebaseId = ? LIMIT 1`;
+        return super.query({ sql, args: [id] });
     }
 
 }

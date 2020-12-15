@@ -1,22 +1,21 @@
-const express = require('express')
-const router = require('./utils/router.js')
-const env = require('./env')
+const express = require('express');
+const router = require('./utils/route.js');
+const env = require('./env.js');
 
-
-//Database and Tables 
-const db = require('./mysql/db.js');
+//Import table classes 
 const Users = require('./mysql/users.js')
 
-//Init Tables
-const users = new Users();
+//End: Import table classes 
 
+//Init table classes
+const users = new Users();
 // End: Init Tables
 
 
 const app = express();
 
 //Middleware that assembles json sent in post request
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
 
 const PORT = env.PORT;
 
@@ -25,11 +24,12 @@ const PORT = env.PORT;
 //Parse json responses to objects 
 app.use(bodyParser.json());
 
-//Allow cross origin requests
-// app.use((req, res, next) => {
-//     res.header('Access-Control-Allow-Origin', '*');
-//     next();
-// });
+// Custom middleware
+app.use((req, res, next) => {
+    console.log(`[${req.method}] ${req.protocol}://${req.get('host')}${req.originalUrl}`);
+    console.log(`Response : ${res}`);
+    next();
+});
 
 app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
 
@@ -38,23 +38,39 @@ app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
 
 //User
 app.post(router('user/'), (req, res) => {
-    users.insert(req.body, res);
-    console.log(req.body);
+    users.insert(req.body).then((response) => {
+        res.send(response);
+    })
+});
+
+app.get(router('user/'), (req, res) => {
+    users.selectAll().then((response) => {
+        res.send(response);
+    });
 });
 
 app.get(router('user/:id/'), (req, res) => {
-    users.selectById(req.params.id, res);
+    users.selectById(req.params.id).then((response) => {
+        res.send(response);
+    });
 });
 
 app.get(router('user/firebase/:id/'), (req, res) => {
-    users.selectByFirebaseId(req.params.id, res);
+    users.selectByFirebaseId(req.params.id).then((response) => {
+        res.send(response)
+    });
 });
 
-app.put(router('users/'), (req, res) => {
+app.patch(router('user/:id'), (req, res) => {
     console.log(req.body);
-    let response = users.select({ id: req.params.id, user: req.body });
-    res.send(response);
+    users.update({ id: req.params.id, user: req.body }).then((response) => {
+        res.send(response);
+    });
 });
+
+
+
+
 
 
 

@@ -1,5 +1,5 @@
-const db = require('./db');
-const transaction = require('./transaction');
+const connection = require('./connection.js');
+const { v4: uuidv4 } = require('uuid');
 
 class Table {
 
@@ -7,115 +7,79 @@ class Table {
         this.objectName = objectName;
     }
 
+    errorMessage = "[Server error: 500] Something went wrong.";
+
     createTable(sql) {
-        let status = false;
-
-        db.query(sql, (err, result) => {
-            try {
+        let con = connection.dbConnection;
+        con.connect(function (err) {
+            if (err) throw err;
+            console.log("Connected!");
+            con.query(sql, function (err, result) {
                 if (err) throw err;
-                console.log(result);
-                status = true;
-
-            } catch (error) {
-                console.error(error);
-            }
+                console.log("Table created");
+            });
         });
-
-        return status;
     }
 
     generateUniqueId() {
-        var result = '';
-        var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        var charactersLength = characters.length;
-        for (var i = 0; i < length; i++) {
+        let length = 28;
+        let result = '';
+        let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let charactersLength = characters.length;
+        for (let i = 0; i < length; i++) {
             result += characters.charAt(Math.floor(Math.random() * charactersLength));
         }
-        // console.log(makeid(5));
+        result =  this.objectName.concat(`-${result}`)
         return result;
     }
 
+
+
     /**
-     * For insert and update queries 
+     * Inserts new row with unique uuid 
      */
-    write({ object, sql, successMessage, response }) {
-        db.query(sql, object, (err, result) => {
+    async insertWithUUID({ sql, object, idField }) {
+        let code;
+        let response;
+        let uuid;
 
-            try {
-                if (err) throw err;
-                console.log(result)
+        do {
+            uuid = uuidv4();
+            object[idField] = uuid;
+            response = await this.query({ sql, args: object });
+            code = response['log']['code'];
+        } while (code == 'ER_DUP_ENTRY');
 
-                response.send({
-                    response: successMessage != null ? successMessage : `${this.objectName} added successfully`,
-                    status: result.affectedRows > 0,
-                    insertId: result.insertId
-                });
-
-            } catch (error) {
-                response.send({
-                    response: 'Something went wrong. Please try again later',
-                    log: { error, object },
-                    status: false,
-                });
-            } finally {
-                db.close();
-            }
-        });
+        response['insertId'] = uuid;
+        return response;
     }
 
     /**
-     * For select queries
+     * For general queries 
      */
-    select({ sql, response }) {
-        db.query(sql, (err, result) => {
-            try {
-                if (err) throw err;
-                console.log(result);
+    async query({ sql, args = null }) {
+        const db = connection.makeDb();
+        let response;
+        let status = false;
+        let log = "Querying the database...";
 
-                response.send({
-                    status: true,
-                    response: result
-                });
+        try {
+            response = args != null ? await db.query(sql, args) : await db.query(sql);
+            status = true;
+            console.log(response);
 
-            } catch (error) {
-                response.send({
-                    status: false,
-                    response: 'Something went wrong. Please try again later',
-                    log: { error, sql },
-                });
+        } catch (e) {
+            // handle the error
+            console.error(e);
+            log = e;
+            response = this.errorMessage;
 
-            } finally {
-                db.close();
-            }
-        });
+        } finally {
+            await db.close();
+        }
+
+        return { response, status, log }
     }
-
-    /**
-     * For delete queries
-     */
-    delete({ sql, response }) {
-        db.query(sql, (err, result) => {
-            try {
-                if (err) throw err;
-                console.log(result);
-
-                response.send({
-                    status: result.affectedRows > 0,
-                    response: successMessage != null ? successMessage : `${this.objectName} deleted successfully`,
-                });
-
-            } catch (error) {
-                response.send({
-                    status: false,
-                    response: 'Something went wrong. Please try again later'
-                });
-
-            } finally {
-                db.close();
-            }
-        });
-    }
-
 
 }
 
