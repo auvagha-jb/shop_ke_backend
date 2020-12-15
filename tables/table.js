@@ -1,4 +1,4 @@
-const connection = require('./connection.js');
+const connection = require('../db/connection.js');
 const { v4: uuidv4 } = require('uuid');
 
 class Table {

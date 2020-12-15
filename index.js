@@ -3,7 +3,7 @@ const router = require('./utils/route.js');
 const env = require('./env.js');
 
 //Import table classes 
-const Users = require('./mysql/users.js')
+const Users = require('./tables/users.js')
 
 //End: Import table classes 
 
