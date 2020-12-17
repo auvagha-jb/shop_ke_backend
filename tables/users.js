@@ -17,7 +17,7 @@ class Users extends Table {
             email VARCHAR(255) NOT NULL, 
             countryCode VARCHAR(255) NOT NULL, 
             phoneNumber VARCHAR(255) NOT NULL,  
-            isShopOwner INT(1) NOT NULL,
+            isShopOwner INT(11) NOT NULL,
             createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP 
         )`;
 
@@ -53,6 +53,5 @@ class Users extends Table {
     }
 
 }
-
 
 module.exports = Users;

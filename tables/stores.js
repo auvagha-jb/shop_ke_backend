@@ -1,47 +1,70 @@
-const Table = require('./table')
+const connection = require('../db/connection.js');
+const Table = require('./table');
+const StoreOwners = require('./store_owners.js');
+const { reset } = require('nodemon');
+const { response } = require('express');
 
 class Stores extends Table {
 
     constructor() {
-        super('User');
+        super('Store');
         this.createTable();
+        this.properties = [
+            'county',
+            'industryId',
+            'logo',
+            'physicalAddress',
+            'storeName'
+        ];
     }
 
     createTable() {
         // Create table
         let sql = ` CREATE TABLE IF NOT EXISTS stores (
-            storeId INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT, 
-            userId INT(11) NOT NULL,
-            storeName VARCHAR(255) NOT NULL,
+            storeId VARCHAR(128) PRIMARY KEY NOT NULL, 
+            county VARCHAR(255) NOT NULL,
+            industryId VARCHAR(128) NOT NULL,
             logo VARCHAR(255) NOT NULL,
+            physicalAddress VARCHAR(255) NOT NULL,
+            storeName VARCHAR(255) NOT NULL,
+            visitCount INT(11) DEFAULT 0,
+            isActive TINYINT(1) NOT NULL,
+            createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )`;
 
-        return super.createTable(sql);
+        super.createTable(sql);
     }
 
 
-    insert(user) {
-        let sql = 'INSERT INTO users SET ?';
-        return super.insert({ object: user, sql: sql })
+    async insert(requestBody) {
+        const db = connection.makeDb();
+        const store = requestBody.store;
+        const user = requestBody.user;
+        const storeId = await super.getUUID({ table: 'stores', idField: 'storeId' });
+        let response = {};
+
+        response = await super.withTransaction(db, async () => {
+            const storeSql = 'INSERT INTO stores SET ?';
+            store.storeId = storeId;
+            await db.query(storeSql, store);
+
+            const storeOwnerSql = 'INSERT INTO store_owners SET ?';
+            await db.query(storeOwnerSql, { storeId: storeId, userId: user.userId });
+        });
+
+        response['insertId'] = response.status ? storeId : null;
+
+        return response;
     }
 
-    query({ id, user }) {
-        let sql = ` UPDATE users SET
-                    firstName  = '${user.firstName}', 
-                    lastName = '${user.lastName}', 
-                    email = '${user.email}', 
-                    countryCode = '${user.countryCode}', 
-                    phoneNumber = '${user.phoneNumber}', 
-                    fullPhoneNumber = '${user.fullPhoneNumber}', 
-                    isShopOwner = '${user.isShopOwner}' WHERE id = ${id}
-                    `;
-
-        return super.query({object: user, sql: sql});
+    update({ store, id }) {
+        let sql = `UPDATE users SET ? WHERE storeId = ?`;
+        return super.query({ sql, args: [store, id] });
     }
 
     selectById(id) {
-        let sql = `SELECT * FROM users WHERE id = ${id}`;
-        return sql;
+        let sql = `SELECT * FROM stores WHERE storeId = ?`;
+        return super.query({ sql, args: [id] });
     }
 
 }

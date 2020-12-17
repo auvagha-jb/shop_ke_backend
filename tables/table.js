@@ -9,15 +9,31 @@ class Table {
 
     errorMessage = "[Server error: 500] Something went wrong.";
 
+    /**
+     * Gets specific properties from the request oject
+     * @param {array} properties The properties you wish to extract
+     * @param {object} requestBody The object send by client
+     */
+    getProperties(properties, requestBody) {
+        let object = {};
+
+        for (let prop of properties) {
+            object[prop] = requestBody[prop];
+        }
+        console.log(object)
+        return object;
+    }
+
     createTable(sql) {
         let con = connection.dbConnection;
-        con.connect(function (err) {
-            if (err) throw err;
-            console.log("Connected!");
-            con.query(sql, function (err, result) {
+        con.query(sql, function (err, result) {
+            try {
                 if (err) throw err;
                 console.log("Table created");
-            });
+
+            } catch (error) {
+                console.log(error);
+            }
         });
     }
 
@@ -29,14 +45,39 @@ class Table {
         for (let i = 0; i < length; i++) {
             result += characters.charAt(Math.floor(Math.random() * charactersLength));
         }
-        result =  this.objectName.concat(`-${result}`)
+        result = this.objectName.concat(`-${result}`)
         return result;
     }
 
+    async getUUID({ table, idField }) {
+        const db = connection.makeDb();
+        let idExists = true;
+        let uuid;
 
+        try {
+            do {
+                uuid = uuidv4();
+                const sql = `SELECT COUNT(*) AS count FROM ${table} WHERE ${idField} = ?`;
+                const query = await db.query(sql, [uuid]);
+
+                if (query[0].count == 0) {
+                    idExists = false;
+                }
+            
+            } while (idExists);
+
+        } catch (error) {
+            console.log(`[getUUID]: ${error}`);
+        } finally {
+            await db.close();
+        }
+
+        return uuid;
+    }
 
     /**
-     * Inserts new row with unique uuid 
+     * Inserts new row with unique uuid
+     * For transactions, pass the db argument to avoid opening a new connection   
      */
     async insertWithUUID({ sql, object, idField }) {
         let code;
@@ -68,10 +109,10 @@ class Table {
             status = true;
             console.log(response);
 
-        } catch (e) {
+        } catch (error) {
             // handle the error
-            console.error(e);
-            log = e;
+            console.error(error);
+            log = error;
             response = this.errorMessage;
 
         } finally {
@@ -79,6 +120,28 @@ class Table {
         }
 
         return { response, status, log }
+    }
+
+    async withTransaction(db, callback) {
+        let status = false;
+        let log = "Performing transaction...";
+
+        try {
+            await db.beginTransaction();
+            await callback();
+            await db.commit();
+            status = true;
+
+        } catch (error) {
+            await db.rollback();
+            log = error;
+            console.log(error);
+        
+        } finally {
+            await db.close();
+        }
+
+        return { log, status };
     }
 
 }
