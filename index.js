@@ -6,12 +6,14 @@ const env = require('./env.js');
 const Users = require('./tables/users.js')
 const Stores = require('./tables/stores.js');
 const StoreOwners = require('./tables/store_owners.js');
+const Subscriptions = require('./tables/subscriptions.js');
 //End: Import table classes 
 
 //Init table classes
 const users = new Users();
 const stores = new Stores();
 const storeOwners = new StoreOwners();
+const subscriptions = new Subscriptions();
 // End: Init Tables
 
 
@@ -87,9 +89,15 @@ app.post(route('store/'), (req, res) => {
 
 
 //Store owners start
-app.delete(route('store-owner/store/:storeId/user/:userId'), (req, res) => {
-    const params = req.params;
-    storeOwners.delete({ storeId: params.storeId, userId: params.userId }).then((response) => {
+app.post(route('subscription/'), (req, res) => {
+    subscriptions.subscribe(req.body).then((response) => {
+        res.send(response);
+    });
+});
+
+app.delete(route('subscription/store/:storeId/user/:userId'), (req, res) => {
+    const { storeId, userId } = req.params;
+    subscriptions.unsubscribe({ storeId, userId }).then((response) => {
         res.send(response);
     });
 });

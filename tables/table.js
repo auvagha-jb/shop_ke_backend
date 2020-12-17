@@ -4,7 +4,8 @@ const { v4: uuidv4 } = require('uuid');
 class Table {
 
     constructor(objectName) {
-        this.objectName = objectName;
+        this.objectName = objectName == null ? objectName : '[NULL]';//Null Check
+        this.defaultLog = `Performing database action on ${this.objectName.toLowerCase()}...`;
     }
 
     errorMessage = "[Server error: 500] Something went wrong.";
@@ -102,7 +103,7 @@ class Table {
         const db = connection.makeDb();
         let response;
         let status = false;
-        let log = "Querying the database...";
+        let log = this.defaultLog;
 
         try {
             response = args != null ? await db.query(sql, args) : await db.query(sql);
@@ -145,6 +146,5 @@ class Table {
     }
 
 }
-
 
 module.exports = Table;

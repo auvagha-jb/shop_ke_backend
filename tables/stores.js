@@ -1,8 +1,5 @@
 const connection = require('../db/connection.js');
 const Table = require('./table');
-const StoreOwners = require('./store_owners.js');
-const { reset } = require('nodemon');
-const { response } = require('express');
 
 class Stores extends Table {
 
@@ -27,8 +24,8 @@ class Stores extends Table {
             logo VARCHAR(255) NOT NULL,
             physicalAddress VARCHAR(255) NOT NULL,
             storeName VARCHAR(255) NOT NULL,
-            visitCount INT(11) DEFAULT 0,
-            isActive TINYINT(1) NOT NULL,
+            visitCount INT(11) NOT NULL DEFAULT 0,
+            isActive TINYINT(1) NOT NULL DEFAULT 1,
             createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )`;
 
@@ -68,6 +65,5 @@ class Stores extends Table {
     }
 
 }
-
 
 module.exports = Stores;
