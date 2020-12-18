@@ -7,6 +7,7 @@ const Users = require('./tables/users.js')
 const Stores = require('./tables/stores.js');
 const StoreOwners = require('./tables/store_owners.js');
 const Subscriptions = require('./tables/subscriptions.js');
+const Products = require('./tables/products.js');
 //End: Import table classes 
 
 //Init table classes
@@ -14,6 +15,7 @@ const users = new Users();
 const stores = new Stores();
 const storeOwners = new StoreOwners();
 const subscriptions = new Subscriptions();
+const products = new Products();
 // End: Init Tables
 
 
@@ -46,7 +48,7 @@ app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
 
 //ROUTES
 
-//User start
+//User routes start
 app.post(route('user/'), (req, res) => {
     users.insert(req.body).then((response) => {
         res.send(response);
@@ -76,7 +78,7 @@ app.patch(route('user/:id'), (req, res) => {
         res.send(response);
     });
 });
-//User end
+//User routes end
 
 
 //Store routes start
@@ -88,7 +90,7 @@ app.post(route('store/'), (req, res) => {
 //Store routes end
 
 
-//Store owners start
+//Subscription routes start
 app.post(route('subscription/'), (req, res) => {
     subscriptions.subscribe(req.body).then((response) => {
         res.send(response);
@@ -101,7 +103,40 @@ app.delete(route('subscription/store/:storeId/user/:userId'), (req, res) => {
         res.send(response);
     });
 });
-//Store owners end
+//Subscription routes end
+
+
+//Product routes start
+app.post(route('product/'), (req, res) => {
+    products.insert(req.body).then((response) => {
+        res.send(response);
+    });
+});
+
+app.patch(route('product/:id'), (req, res) => {
+    products.update({id: req.params.id, product: req.body}).then((response) => {
+        res.send(response);
+    });
+});
+
+app.patch(route('product/archive/:id'), (req, res) => {
+    products.archive(req.params.id).then((response) => {
+        res.send(response);
+    });
+});
+
+app.patch(route('product/restore/:id'), (req, res) => {
+    products.restore(req.params.id).then((response) => {
+        res.send(response);
+    });
+});
+
+app.get(route('product/'), (req, res) => {
+    products.selectAll().then((response) => {
+        res.send(response);
+    });
+});
+//Product routes end
 
 
 

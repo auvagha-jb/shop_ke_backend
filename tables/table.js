@@ -5,7 +5,7 @@ class Table {
 
     constructor(objectName) {
         this.objectName = objectName == null ? objectName : '[NULL]';//Null Check
-        this.defaultLog = `Performing database action on ${this.objectName.toLowerCase()}...`;
+        this.defaultLog = `Performing database action on database...`;
     }
 
     errorMessage = "[Server error: 500] Something went wrong.";
@@ -36,18 +36,6 @@ class Table {
                 console.log(error);
             }
         });
-    }
-
-    generateUniqueId() {
-        let length = 28;
-        let result = '';
-        let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        let charactersLength = characters.length;
-        for (let i = 0; i < length; i++) {
-            result += characters.charAt(Math.floor(Math.random() * charactersLength));
-        }
-        result = this.objectName.concat(`-${result}`)
-        return result;
     }
 
     async getUUID({ table, idField }) {
@@ -114,13 +102,30 @@ class Table {
             // handle the error
             console.error(error);
             log = error;
-            response = this.errorMessage;
+            response = this.getErrorMessage(error);
 
         } finally {
             await db.close();
         }
 
         return { response, status, log }
+    }
+
+
+    getErrorMessage(error) {
+        let errorMessage;
+
+        switch (error.code) {
+            case 'ER_PARSE_ERROR':
+                errorMessage = "Nothing was passed in the request body";
+                break;
+        
+            default:
+                errorMessage = this.errorMessage;
+                break;
+        }
+
+        return errorMessage;
     }
 
     async withTransaction(db, callback) {
