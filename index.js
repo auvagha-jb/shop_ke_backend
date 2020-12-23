@@ -8,6 +8,8 @@ const Stores = require('./tables/stores.js');
 const StoreOwners = require('./tables/store_owners.js');
 const Subscriptions = require('./tables/subscriptions.js');
 const Products = require('./tables/products.js');
+const Orders = require('./tables/orders.js');
+const OrderItems = require('./tables/order_items.js');
 //End: Import table classes 
 
 //Init table classes
@@ -16,6 +18,8 @@ const stores = new Stores();
 const storeOwners = new StoreOwners();
 const subscriptions = new Subscriptions();
 const products = new Products();
+const orders = new Orders();
+const orderItems = new OrderItems();
 // End: Init Tables
 
 
@@ -34,12 +38,6 @@ app.use(bodyParser.json());
 // Custom middleware
 app.use(async (req, res, next) => {
     console.log(`[${req.method}] ${req.protocol}://${req.get('host')}${req.originalUrl}`);
-
-    if (req.method == "POST" || req.method == "PATCH") {
-        console.log(`[Request body] ${await req.body}`);
-    }
-
-    console.log(`Response : ${await res}`);
     next();
 });
 
@@ -50,6 +48,7 @@ app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
 
 //User routes start
 app.post(route('user/'), (req, res) => {
+    console.log({user: req.body});
     users.insert(req.body).then((response) => {
         res.send(response);
     })
@@ -61,15 +60,15 @@ app.get(route('user/'), (req, res) => {
     });
 });
 
-app.get(route('user/:id/'), (req, res) => {
-    users.selectById(req.params.id).then((response) => {
+app.get(route('user/firebase/:id/'), (req, res) => {
+    users.selectByFirebaseId(req.params.id).then((response) => {
         res.send(response);
     });
 });
 
-app.get(route('user/firebase/:id/'), (req, res) => {
-    users.selectByFirebaseId(req.params.id).then((response) => {
-        res.send(response)
+app.get(route('user/:id/'), (req, res) => {
+    users.selectById(req.params.id).then((response) => {
+        res.send(response);
     });
 });
 
@@ -114,7 +113,7 @@ app.post(route('product/'), (req, res) => {
 });
 
 app.patch(route('product/:id'), (req, res) => {
-    products.update({id: req.params.id, product: req.body}).then((response) => {
+    products.update({ id: req.params.id, product: req.body }).then((response) => {
         res.send(response);
     });
 });
@@ -137,6 +136,35 @@ app.get(route('product/'), (req, res) => {
     });
 });
 //Product routes end
+
+
+//Order routes start
+
+app.post(route('order/'), (req, res) => {
+    orders.insert(req.body).then((response) => {
+        res.send(response);
+    });
+});
+
+app.get(route('order/:orderId'), (req, res) => {
+    orders.selectByOrderId(req.params.orderId).then((response) => {
+        res.send(response);
+    });
+});
+
+app.get(route('order/user/:userId/'), (req, res) => {
+    orders.selectAllOrdersByUser(req.params.userId).then((response) => {
+        res.send(response)
+    });
+});
+
+app.get(route('order/store/:storeId/'), (req, res) => {
+    orders.selectAllOrdersToStore(req.params.storeId).then((response) => {
+        res.send(response)
+    });
+});
+
+//Order routes end
 
 
 

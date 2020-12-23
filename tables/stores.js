@@ -1,5 +1,5 @@
-const connection = require('../db/connection.js');
 const Table = require('./table');
+const connection = require('../db/connection.js');
 
 class Stores extends Table {
 

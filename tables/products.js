@@ -4,8 +4,8 @@ class Products extends Table {
 
     constructor() {
         super('Product');
+        this.tableName = 'products';
         this.createTable();
-        this.tableName = 'Products';
     }
 
     createTable() {
@@ -19,7 +19,7 @@ class Products extends Table {
             price FLOAT(11) NOT NULL,
             numInStock INT(11) NOT NULL,
             createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            deletedAt TIMESTAMP 
+            deletedAt TIMESTAMP NULL DEFAULT NULL
         )`;
 
         super.createTable(sql);
