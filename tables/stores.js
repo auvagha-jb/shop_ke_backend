@@ -20,9 +20,9 @@ class Stores extends Table {
         let sql = ` CREATE TABLE IF NOT EXISTS stores (
             storeId VARCHAR(128) PRIMARY KEY NOT NULL, 
             county VARCHAR(255) NOT NULL,
-            industryId VARCHAR(128) NOT NULL,
+            industry VARCHAR(128) NOT NULL,
             logo VARCHAR(255) NOT NULL,
-            physicalAddress VARCHAR(255) NOT NULL,
+            physicalAddress VARCHAR(255),
             storeName VARCHAR(255) NOT NULL,
             visitCount INT(11) NOT NULL DEFAULT 0,
             isActive TINYINT(1) NOT NULL DEFAULT 1,
@@ -55,13 +55,25 @@ class Stores extends Table {
     }
 
     update({ store, id }) {
-        let sql = `UPDATE users SET ? WHERE storeId = ?`;
+        let sql = `UPDATE stores SET ? WHERE storeId = ?`;
         return super.query({ sql, args: [store, id] });
     }
 
     selectById(id) {
-        let sql = `SELECT * FROM stores WHERE storeId = ?`;
+        let sql = ` SELECT * FROM stores 
+                    WHERE storeId = ?`;
         return super.query({ sql, args: [id] });
+    }
+
+    selectByUserId(userId) {
+        let sql = ` SELECT * FROM stores 
+                    JOIN store_owners
+                    ON stores.storeId = store_owners.storeId
+                    JOIN users
+                    ON users.userId = store_owners.userId
+                    WHERE users.userId = ?
+                    LIMIT 1`;
+        return super.query({ sql, args: [userId] });
     }
 
 }

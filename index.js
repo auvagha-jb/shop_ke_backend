@@ -46,6 +46,7 @@ app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
 
 //ROUTES
 
+
 //User routes start
 app.post(route('user/'), (req, res) => {
     console.log({user: req.body});
@@ -86,6 +87,19 @@ app.post(route('store/'), (req, res) => {
         res.send(response);
     });
 });
+
+app.get(route('store/:id'), (req, res) => {
+    stores.selectById(req.params.id).then((response) => {
+        res.send(response);
+    });
+});
+
+app.get(route('store/user/:id'), (req, res) => {
+    stores.selectByUserId(req.params.id).then((response) => {
+        res.send(response);
+    });
+});
+
 //Store routes end
 
 
@@ -165,8 +179,3 @@ app.get(route('order/store/:storeId/'), (req, res) => {
 });
 
 //Order routes end
-
-
-
-
-
