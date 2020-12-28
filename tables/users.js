@@ -43,13 +43,21 @@ class Users extends Table {
     }
 
     selectById(id) {
-        let sql = `SELECT * FROM users WHERE userId = ?`;
+        let sql = 'SELECT * FROM users WHERE userId = ?';
         return super.query({ sql, args: [id] });
     }
 
     selectByFirebaseId(id) {
-        let sql = `SELECT * FROM users WHERE firebaseId = ? LIMIT 1`;
+        let sql = 'SELECT * FROM users WHERE firebaseId = ? LIMIT 1';
         return super.query({ sql, args: [id] });
+    }
+
+    async emailExists(email) {
+        let sql = 'SELECT COUNT(*) AS no_email FROM users WHERE email = ?';
+        let { response, status, log } = await super.query({ sql, args: [email] });
+        response[0]['emailExists'] = response[0].no_email > 0;
+
+        return { response, status, log };
     }
 
 }

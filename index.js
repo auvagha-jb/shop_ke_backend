@@ -73,6 +73,12 @@ app.get(route('user/:id/'), (req, res) => {
     });
 });
 
+app.get(route('user/email-exists/:email/'), (req, res) => {
+    users.emailExists(req.params.email).then((response) => {
+        res.send(response);
+    });
+});
+
 app.patch(route('user/:id'), (req, res) => {
     users.update({ id: req.params.id, user: req.body }).then((response) => {
         res.send(response);
