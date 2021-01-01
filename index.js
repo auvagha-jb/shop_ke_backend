@@ -126,8 +126,21 @@ app.delete(route('subscription/store/:storeId/user/:userId'), (req, res) => {
 
 
 //Product routes start
+
 app.post(route('product/'), (req, res) => {
     products.insert(req.body).then((response) => {
+        res.send(response);
+    });
+});
+
+app.get(route('product/'), (req, res) => {
+    products.selectAll().then((response) => {
+        res.send(response);
+    });
+});
+
+app.get(route('product/store/:storeId'), (req, res) => {
+    products.selectBy({'storeId': req.params.storeId}).then((response) => {
         res.send(response);
     });
 });
@@ -150,11 +163,6 @@ app.patch(route('product/restore/:id'), (req, res) => {
     });
 });
 
-app.get(route('product/'), (req, res) => {
-    products.selectAll().then((response) => {
-        res.send(response);
-    });
-});
 //Product routes end
 
 
