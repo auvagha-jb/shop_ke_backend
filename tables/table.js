@@ -6,9 +6,9 @@ class Table {
     constructor(objectName) {
         this.objectName = objectName == null ? objectName : '[NULL]';//Null Check
         this.defaultLog = `Performing database action on database...`;
+        this.errorMessage = "[Server error: 500] Something went wrong.";
     }
 
-    errorMessage = "[Server error: 500] Something went wrong.";
 
     /**
      * Gets specific properties from the request oject
@@ -52,7 +52,7 @@ class Table {
                 if (query[0].count == 0) {
                     idExists = false;
                 }
-            
+
             } while (idExists);
 
         } catch (error) {
@@ -119,7 +119,7 @@ class Table {
             case 'ER_PARSE_ERROR':
                 errorMessage = "Nothing was passed in the request body";
                 break;
-        
+
             default:
                 errorMessage = this.errorMessage;
                 break;
@@ -142,7 +142,7 @@ class Table {
             await db.rollback();
             log = error;
             console.log(error);
-        
+
         } finally {
             await db.close();
         }
