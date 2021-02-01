@@ -44,7 +44,7 @@ app.use(async (req, res, next) => {
 app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
 
 
-//ROUTES
+//*****ROUTES*****//
 
 
 //User routes start
@@ -129,6 +129,13 @@ app.delete(route('subscription/store/:storeId/user/:userId'), (req, res) => {
 
 app.post(route('product/'), (req, res) => {
     products.insert(req.body).then((response) => {
+        res.send(response);
+    });
+});
+
+app.get(route('product/search/:productName'), (req, res) => {
+    const productName = req.params.productName;
+    products.selectByProductName(productName).then((response) => {
         res.send(response);
     });
 });

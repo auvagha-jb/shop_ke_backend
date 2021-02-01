@@ -46,6 +46,11 @@ class Products extends Table {
         return super.query({ sql, args });
     }
 
+    selectByProductName(productName) {
+        let sql = `SELECT * FROM products WHERE productName LIKE "%${productName}%"`;
+        return super.query({ sql });
+    }
+
     archive(id) {
         let sql = `UPDATE ${this.tableName} SET deletedAT = NOW() WHERE productId = ?`;
         return super.query({ sql, args: [id]});
