@@ -5,7 +5,7 @@ class Table {
 
     constructor(objectName) {
         this.objectName = objectName == null ? objectName : '[NULL]';//Null Check
-        this.defaultLog = `Performing database action on database...`;
+        this.defaultLog = `Performing action on database...`;
         this.errorMessage = "[Server error: 500] Something went wrong.";
     }
 

@@ -10,7 +10,8 @@ const makeDb = () => {
                 .call(connection, sql, args);
         },
         close() {
-            return util.promisify(connection.end).call(connection);
+            return util.promisify(connection.end)
+                .call(connection);
         },
         beginTransaction() {
             return util.promisify(connection.beginTransaction)

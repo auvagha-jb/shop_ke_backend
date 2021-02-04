@@ -1,5 +1,6 @@
 const Table = require('./table')
 const connection = require('../db/connection.js');
+const NumberUtil = require('../utils/number_util.js');
 
 class Orders extends Table {
 
@@ -15,8 +16,7 @@ class Orders extends Table {
         let sql = ` CREATE TABLE IF NOT EXISTS orders (
             orderId VARCHAR(128) PRIMARY KEY NOT NULL, 
             userId VARCHAR(128) NOT NULL,
-            storeId VARCHAR(128) NOT NULL,
-            orderTotal FLOAT(11) NOT NULL,
+            orderTotal DECIMAL(11,2) NOT NULL,
             orderStatus ENUM('Pending','Cancelled', 'Complete'),
             createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )`;
@@ -24,10 +24,21 @@ class Orders extends Table {
         super.createTable(sql);
     }
 
-
+    /**
+     * 
+     * @param {object} requestBody 
+     *  requestBody{
+     *      "order": {"userId", "storeId", "orderStatus", "orderTotal"},
+     *       "orderItems": [
+     *           {"productId","price","quantity": "1","subtotal"}
+     *       ]
+     *   }
+     */
     async insert(requestBody) {
         const db = connection.makeDb();
         const order = requestBody.order;
+        order['orderId'] = new NumberUtil().roundToTwoDecimalPlaces(order['orderId']);
+
         const orderItems = requestBody.orderItems;
         const orderId = await super.getUUID({ table: this.tableName, idField: this.idField });
         let response = {};
@@ -59,17 +70,22 @@ class Orders extends Table {
     }
 
     selectAllOrdersToStore(storeId) {
-        let sql = ` SELECT * FROM orders  
-                    JOIN users
+        let sql = ` SELECT * FROM users  
+                    JOIN orders
                     ON orders.userId = users.userId 
-                    WHERE orders.storeId = ?
-                    ORDER BY orders.createdAt`;
+                    JOIN order_items
+                    ON orders.orderId = order_items.orderId  
+                    WHERE order_items.storeId = ?
+                    GROUP BY orders.orderId
+                    ORDER BY orders.createdAt
+                    `;
         return super.query({ sql, args: [storeId] });
     }
 
     selectAllOrdersByUser(userId) {
         let sql = ` SELECT * FROM orders
-                    WHERE orders.userId = ?`;
+                    WHERE orders.userId = ?
+                    ORDER BY createdAt`;
         return super.query({ sql, args: [userId] });
     }
 
