@@ -16,7 +16,7 @@ class Products extends Table {
             productName VARCHAR(255) NOT NULL,
             description VARCHAR(255) DEFAULT NULL,
             imageUrl VARCHAR(255) DEFAULT NULL,
-            price FLOAT(11) NOT NULL,
+            price DECIMAL(11,2) NOT NULL,
             numInStock INT(11) NOT NULL,
             createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             deletedAt TIMESTAMP NULL DEFAULT NULL

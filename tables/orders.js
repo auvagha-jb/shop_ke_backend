@@ -37,7 +37,7 @@ class Orders extends Table {
     async insert(requestBody) {
         const db = connection.makeDb();
         const order = requestBody.order;
-        order['orderId'] = new NumberUtil().roundToTwoDecimalPlaces(order['orderId']);
+        order['orderTotal'] = new NumberUtil().roundToTwoDecimalPlaces(order['orderId']);
 
         const orderItems = requestBody.orderItems;
         const orderId = await super.getUUID({ table: this.tableName, idField: this.idField });
@@ -85,7 +85,7 @@ class Orders extends Table {
     selectAllOrdersByUser(userId) {
         let sql = ` SELECT * FROM orders
                     WHERE orders.userId = ?
-                    ORDER BY createdAt`;
+                    ORDER BY createdAt DESC`;
         return super.query({ sql, args: [userId] });
     }
 

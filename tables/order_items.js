@@ -13,7 +13,7 @@ class OrderItems extends Table {
             orderId VARCHAR(128) NOT NULL, 
             storeId VARCHAR(128) NOT NULL, 
             productId VARCHAR(128) NOT NULL,
-            price FLOAT(11) NOT NULL,
+            price DECIMAL(11,2) NOT NULL,
             quantity VARCHAR(255) NOT NULL,
             subtotal FLOAT(11) NOT NULL,
             PRIMARY KEY (orderId, productId)
