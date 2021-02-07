@@ -1,6 +1,5 @@
 const Table = require('./table')
 const connection = require('../db/connection.js');
-const NumberUtil = require('../utils/number_util.js');
 
 class Orders extends Table {
 
@@ -37,7 +36,6 @@ class Orders extends Table {
     async insert(requestBody) {
         const db = connection.makeDb();
         const order = requestBody.order;
-        order['orderTotal'] = new NumberUtil().roundToTwoDecimalPlaces(order['orderId']);
 
         const orderItems = requestBody.orderItems;
         const orderId = await super.getUUID({ table: this.tableName, idField: this.idField });
