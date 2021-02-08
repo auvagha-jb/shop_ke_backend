@@ -1,5 +1,6 @@
 const fetch = require('node-fetch');
-const base_url = "https://api.themoviedb.org/3/search/movie?api_key=15d2ea6d0dc1d476efbca3eba2b9bbfb&query=";
+const env = require('../env.js');
+const base_url = `https://api.themoviedb.org/3/search/movie?api_key=${env.MOVIES_API}&query=`;
 const image_url = "http://image.tmdb.org/t/p/w500/";
 let settings = { method: "GET" };
 
