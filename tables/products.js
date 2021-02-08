@@ -47,7 +47,7 @@ class Products extends Table {
     }
 
     selectByProductName(productName) {
-        let sql = `SELECT * FROM products WHERE productName LIKE "%${productName}%"`;
+        let sql = `SELECT * FROM products WHERE productName LIKE '%${productName}%'`;
         return super.query({ sql });
     }
 

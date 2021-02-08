@@ -10,6 +10,7 @@ const Subscriptions = require('./tables/subscriptions.js');
 const Products = require('./tables/products.js');
 const Orders = require('./tables/orders.js');
 const OrderItems = require('./tables/order_items.js');
+const Movies = require('./tables/movies.js');
 //End: Import table classes 
 
 //Init table classes
@@ -20,6 +21,7 @@ const subscriptions = new Subscriptions();
 const products = new Products();
 const orders = new Orders();
 const orderItems = new OrderItems();
+const movies = new Movies();
 // End: Init Tables
 
 
@@ -199,4 +201,28 @@ app.get(route('order/store/:storeId/'), (req, res) => {
     });
 });
 
+
 //Order routes end
+
+
+//Movie routes start
+
+app.get(route('movie/'), (req, res) => {
+    movies.getFirstNumMovies().then((response) => {
+        res.send(response)
+    });
+});
+
+app.get(route('movie/genre/:genre'), (req, res) => {
+    movies.getByGenre(req.params.genre).then((response) => {
+        res.send(response)
+    });
+});
+
+app.get(route('movie/poster/:movieTitle'), (req, res) => {
+    movies.getPoster(req.params.movieTitle).then((response) => {
+        res.send(response)
+    });
+});
+
+//Movie routes end
