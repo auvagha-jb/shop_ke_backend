@@ -5,7 +5,7 @@ var rqs = recombee.requests;
 const ProductInteractions = require('../tables/product_interactions.js');
 
 class RecombeeApi {
-  
+
   constructor() {
     console.log('Recombee Api');
   }
@@ -15,15 +15,7 @@ class RecombeeApi {
 
     try {
       let response = await client.send(new rqs.RecommendItemsToUser(userId, 5));
-
-      let ids = [];
-      for (var object of response.recomms) {
-        ids.push(object['id']);
-      }
-      items = ids;
-
-      items = new ProductInteractions().selectProductsById(ids);
-
+      items = this.getItemsFromRecommedation(response);
     } catch (error) {
       console.error(`recommendation error: ${error}`);
     }
@@ -31,15 +23,51 @@ class RecombeeApi {
     return items;
   }
 
-  getNext(res) {
-    return client.send(new rqs.RecommendNextItems(response.recommId, 3))
+  async getInteractions(userId) {
+    let items = [];
+
+    try {
+      let response = await client.send(new rqs.ListUserDetailViews(userId));
+      items = this.getItemsFromInteractions(response);
+      console.log(items);
+    } catch (error) {
+      console.error(`recommendation error: ${error}`);
+    }
+
+    return items;
   }
 
-  async get(userId) {
-    return userId;
+  async getItemsFromRecommedation(response) {
+    const ids = [];
+    for (var object of response.recomms) {
+      ids.push(object['id']);
+    }
+
+    const items = new ProductInteractions().selectProductsById(ids);
+    return items;
+  }
+
+  getItemsFromRecommedation(response) {
+    let ids = [];
+    for (var object of response.recomms) {
+      ids.push(object['id']);
+    }
+
+    const items = new ProductInteractions().selectProductsById(ids);
+    return items;
+  }
+
+  getItemsFromInteractions(response) {
+    let ids = [];
+    for (let map of response) {
+      ids.push(map['itemId']);
+    }
+
+    ids = ids.filter((v, i, a) => a.indexOf(v) === i);
+
+    const items = new ProductInteractions().selectProductsById(ids);
+    return items;
   }
 }
-
-new RecombeeApi().getRecommendations('422073359');
 
 module.exports = RecombeeApi;

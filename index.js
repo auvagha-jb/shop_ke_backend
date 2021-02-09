@@ -229,14 +229,17 @@ app.get(route('movie/poster/:movieTitle'), (req, res) => {
 
 //Movie routes end
 
-app.get(route('recommend/:userId'), (req, res) => {
+
+//Recombee routes start
+app.get(route('recombee/recommend/:userId'), (req, res) => {
     recombeeApi.getRecommendations(req.params.userId).then((response) => {
         res.send(response)
     });
 });
 
-app.get(route('movie/poster/:movieTitle'), (req, res) => {
-    movies.getPoster(req.params.movieTitle).then((response) => {
+app.get(route('recombee/interactions/:userId'), (req, res) => {
+    recombeeApi.getInteractions(req.params.userId).then((response) => {
         res.send(response)
     });
 });
+//Recombee routes start
