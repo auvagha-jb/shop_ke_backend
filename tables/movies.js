@@ -5,7 +5,6 @@ class Movies extends Table {
 
     constructor() {
         super('Movies');
-        // this.createTable();
     }
 
     /**

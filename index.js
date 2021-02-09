@@ -11,6 +11,7 @@ const Products = require('./tables/products.js');
 const Orders = require('./tables/orders.js');
 const OrderItems = require('./tables/order_items.js');
 const Movies = require('./tables/movies.js');
+const RecombeeApi = require('./recombee_api/recombee_api.js');
 //End: Import table classes 
 
 //Init table classes
@@ -22,6 +23,7 @@ const products = new Products();
 const orders = new Orders();
 const orderItems = new OrderItems();
 const movies = new Movies();
+const recombeeApi = new RecombeeApi();
 // End: Init Tables
 
 
@@ -226,3 +228,15 @@ app.get(route('movie/poster/:movieTitle'), (req, res) => {
 });
 
 //Movie routes end
+
+app.get(route('recommend/:userId'), (req, res) => {
+    recombeeApi.getRecommendations(req.params.userId).then((response) => {
+        res.send(response)
+    });
+});
+
+app.get(route('movie/poster/:movieTitle'), (req, res) => {
+    movies.getPoster(req.params.movieTitle).then((response) => {
+        res.send(response)
+    });
+});

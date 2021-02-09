@@ -1,11 +1,9 @@
-var env = require('../env.js');
-var recombee = require('recombee-api-client');
 var rqs = recombee.requests;
 
 var client = new recombee.ApiClient(env.RECOMBEE_DB_ID, env.RECOMBEE_PRIVATE_KEY);
 
 // Prepare some userIDs and itemIDs
-const NUM = 100;
+const NUM = 10000;
 var userIds = Array.apply(0, Array(NUM)).map((_, i) => {
   return `user-${i}`;
 });
@@ -29,7 +27,7 @@ userIds.forEach((userId) => {
 client.send(new rqs.Batch(purchases))
   .then(() => {
     //Get 5 recommended items for user 'user-25'
-    return client.send(new rqs.RecommendItemsToUser('user-25', 5));
+    return client.send(new rqs.RecommendItemsToUser('user-1', 5));
   })
   .then((response) => {
     console.log("Recommended items for user-25: %j", response.recomms);
