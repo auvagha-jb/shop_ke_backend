@@ -147,7 +147,7 @@ app.get(route('product/search/:productName'), (req, res) => {
 app.get(route('product/'), (req, res) => {
     products.selectAll().then((response) => {
         res.send(response);
-    });
+    });  
 });
 
 app.get(route('product/store/:storeId'), (req, res) => {

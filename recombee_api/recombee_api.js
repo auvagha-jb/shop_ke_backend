@@ -3,6 +3,7 @@ var recombee = require('recombee-api-client');
 var client = new recombee.ApiClient(env.RECOMBEE_DB_ID, env.RECOMBEE_PRIVATE_KEY);
 var rqs = recombee.requests;
 const ProductInteractions = require('../tables/product_interactions.js');
+const itemProperties = ["category_code", "brand", "price"];
 
 class RecombeeApi {
 
@@ -11,25 +12,29 @@ class RecombeeApi {
   }
 
   async getRecommendations(userId) {
-    let items = [];
+    let response;
 
     try {
-      let response = await client.send(new rqs.RecommendItemsToUser(userId, 5));
-      items = this.getItemsFromRecommedation(response);
+      response = await client.send(new rqs.RecommendItemsToUser(userId, 5, 
+        {
+          returnProperties: true,
+          includedProperties: itemProperties
+        }
+      ));
     } catch (error) {
       console.error(`recommendation error: ${error}`);
     }
 
-    return items;
+    return response;
   }
 
   async getInteractions(userId) {
     let items = [];
 
     try {
-      let response = await client.send(new rqs.ListUserDetailViews(userId));
+      let response = await client.send(new rqs.ListUserDetailViews(userId),);
       items = this.getItemsFromInteractions(response);
-      console.log(items);
+      // console.log(items);
     } catch (error) {
       console.error(`recommendation error: ${error}`);
     }
@@ -47,15 +52,15 @@ class RecombeeApi {
     return items;
   }
 
-  getItemsFromRecommedation(response) {
-    let ids = [];
-    for (var object of response.recomms) {
-      ids.push(object['id']);
-    }
+  // getItemsFromRecommedation(response) {
+  //   let ids = [];
+  //   for (var object of response.recomms) {
+  //     ids.push(object['id']);
+  //   }
 
-    const items = new ProductInteractions().selectProductsById(ids);
-    return items;
-  }
+  //   const items = new ProductInteractions().selectProductsById(ids);
+  //   return items;
+  // }
 
   getItemsFromInteractions(response) {
     let ids = [];
